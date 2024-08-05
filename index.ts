@@ -20,7 +20,7 @@ import app from "./server/app";
 //   )
 
 export default {  
-    port: 3010, 
+    port: 3000, 
     fetch: app.fetch, 
   } 
 

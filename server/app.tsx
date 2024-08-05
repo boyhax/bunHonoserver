@@ -1,4 +1,7 @@
 import { Hono } from "hono";
+import { serveStatic } from 'hono/bun'
+import type { FC } from 'hono/jsx'
+
 // import book from "./routes/book";
 // import listing from "./routes/listing";
 // import mongoose from "mongoose";
@@ -7,6 +10,8 @@ import {createClient} from '@supabase/supabase-js'
 // import record from "./routes/record";
 // import { Client, Databases } from 'appwrite';
 import { timeout } from 'hono/timeout'
+import Home from '../client/index.tsx'
+import React from "react";
 
 // export const client = new Client();
 // export const database = new Databases(client)
@@ -27,10 +32,20 @@ import { timeout } from 'hono/timeout'
 // const records = await pb.collection('books').getFullList({
 //   sort: '-created',
 // });
+
+const Layout: FC = (props) => {
+  return (
+    <html>
+      <body><Home/></body>
+      
+    </html>
+  )
+}
 const app = new Hono();
 app.use('/',timeout(5000))
+app.use('*', serveStatic({ root: '../client' }))
 app.get("/", async (c) => {
-  return c.html(`<h1>hello<h1>`);
+  return c.html(<Layout/>);
 });
 
 app.get("/hello", (c) => c.text("Hello9 Bun from hello route"));
