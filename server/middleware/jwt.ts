@@ -1,8 +1,7 @@
-import { jwt } from 'hono/jwt'
+import { secret } from "@server/config/vars";
+import type { MiddlewareHandler } from "hono";
+import { jwt } from "hono/jwt";
 
-const secret = process.env['jwt_secret'] as string
-
-
-export default jwt({
-  secret,
-})
+export function JwtMiddlware(): MiddlewareHandler {
+  return jwt({ secret });
+}
