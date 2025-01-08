@@ -1,16 +1,16 @@
 {
   "name": "oamnstory",
-  "private": true,
-  "module": "server/index.ts",
   "version": "0.0.0",
+  "module": "server/index.ts",
+  "private": true,
+  "scripts": {
+    "start": "bun run start:server && bun run start:client",
+    "start:server": "cd server && bun run index.ts && cd ..",
+    "start:client": "cd mobile && bunx vite && cd .."
+  },
   "type": "module",
   "workspaces": [
     "mobile",
     "server"
-  ],
-
-  "dependencies": {
-    "@types/validator": "^13.12.2",
-    "server": "^1.0.41"
-  }
+  ]
 }
