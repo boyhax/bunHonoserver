@@ -8,9 +8,7 @@
     "mobile",
     "server"
   ],
-  "scripts": {
-    "install": "pnpm i"
-  },
+
   "dependencies": {
     "@types/validator": "^13.12.2",
     "server": "^1.0.41"

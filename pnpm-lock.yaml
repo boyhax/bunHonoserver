@@ -176,9 +176,6 @@ importers:
       react-router-dom:
         specifier: ^5.3.4
         version: 5.3.4(react@18.3.1)
-      server:
-        specifier: link:../server
-        version: link:../server
       tailwind-merge:
         specifier: ^2.5.5
         version: 2.5.5
@@ -258,8 +255,6 @@ importers:
       vitest:
         specifier: ^0.34.6
         version: 0.34.6(jsdom@22.1.0)(terser@5.37.0)
-
-  sdk: {}
 
   server:
     dependencies:
