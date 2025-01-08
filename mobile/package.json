@@ -65,7 +65,6 @@
     "react-hook-form": "^7.54.1",
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4",
-    "server": "link:../server",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.1",
