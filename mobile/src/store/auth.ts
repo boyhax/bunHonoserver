@@ -1,19 +1,20 @@
+import { client } from "@/App";
+import { Session } from "@/types";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
-export type Session = {
-  token: string;
-  user: {
-    name: string;
-  };
-};
+
 type AuthStore = {
   session: Session | null;
+  logout: () => void;
 };
 export const useAuth = create<AuthStore>()(
   persist(
     devtools(
-      () => ({
+      (set, get) => ({
         session: null,
+        logout: () => {
+          client.auth.signout();
+        },
       }),
       { name: "auth" }
     ),

@@ -18,8 +18,16 @@ import '@ionic/react/css/palettes/dark.system.css';
 import './theme/variables.css';
 import { routeTree } from './routeTree';
 import { Toaster } from './components/ui/toaster';
-import { initClient } from './lib/client';
+import Client from './lib/client';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { useAuth } from './store/auth';
+import { apiurl } from './lib/api';
 
+import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
+import { authClient } from './lib/client/auth';
+import { Session } from './types';
+const EventSourcepoly = NativeEventSource || EventSourcePolyfill;
+// global.EventSource = NativeEventSource || EventSourcePolyfill;
 
 setupIonicReact();
 
@@ -30,15 +38,25 @@ declare module '@tanstack/react-router' {
     router: typeof router
   }
 }
+const Queryclient = new QueryClient({});
+const session = useAuth.getState().session
 
-export const client = initClient({ path: 'http://localhost:8080/api', authConfig: {} })
+export const client = Client;
+client.path = apiurl()
+
+function onAuthChange(session: Session | null) {
+  useAuth.setState({ session })
+}
+client.auth = authClient(client, { session, onAuthChange });
+
+
 
 const App: React.FC = () => (
 
   <IonApp className="h-screen flex flex-col overflow-hidden">
-
-    <RouterProvider router={router} />
-
+    <QueryClientProvider client={Queryclient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
     <Toaster />
   </IonApp>
 

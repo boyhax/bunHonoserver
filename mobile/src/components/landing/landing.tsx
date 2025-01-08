@@ -1,8 +1,8 @@
-import Header from '@/components/landing/header'
 import Hero from '@/components/landing/hero'
 import FeaturedShops from '@/components/landing/featured-shops'
-import ProductSamples from '@/components/landing/product-samples'
+import FeaturedProducts from '@/components/landing/FeaturedProducts'
 import Footer from '@/components/landing/footer'
+import FeaturedCategories from './FeaturedCategories'
 
 export default function LandingPage() {
 
@@ -11,8 +11,9 @@ export default function LandingPage() {
       {/* <Header /> */}
       <main className="flex-grow overflow-y-auto">
         <Hero />
+        <FeaturedCategories />
         <FeaturedShops />
-        <ProductSamples />
+        <FeaturedProducts />
       </main>
       <Footer />
     </div>

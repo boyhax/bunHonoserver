@@ -10,19 +10,20 @@ import { cors } from "hono/cors";
 
 import clientRoute from "./routes/api/client";
 type Bindings = {
-    c
+    ss: string
 }
-
-const app = new Hono<{ Bindings: Bindings }>();
-
 connectDB();
-app
-    .use('*', logger(), prettyJSON(), cors({
-        origin: '*',
-        allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    }))
+const app = new Hono<{ Bindings: Bindings }>()
+    .use('*',
+        logger(),
+        prettyJSON(),
+        cors({
+            origin: '*',
+            allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        })
+    )
     .use('/', timeout(5000))
-    .use('/public/*', serveStatic({ root: '../public' }))
+    .use('/public/*', serveStatic({ root: './' }))
     .route("/api", api)
     .get('/', clientRoute)
 

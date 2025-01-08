@@ -1,13 +1,8 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import {
-  createUser,
-  findUser,
-  listUsers,
-  updateUser,
-} from "@server/services/users";
-import { JwtMiddlware } from "@server/middleware/jwt";
+import { createUser, findUser, listUsers, updateUser } from "@/services/users";
+import { JwtMiddlware } from "@/middleware/jwt";
 
 const users = new Hono()
   .get(
@@ -35,7 +30,7 @@ const users = new Hono()
   )
   .get("/:id", async (c) => {
     const id = c.req.param("id");
-    const user = await findUser(id);
+    const user = await findUser({ id });
 
     if (!user) {
       return c.json({ error: "User not found" }, 404);
@@ -71,9 +66,10 @@ const users = new Hono()
     zValidator(
       "json",
       z.object({
-        name: z.string(),
         email: z.string().email(),
         password: z.string().min(6),
+        name: z.string().min(5),
+        avatar: z.string().optional(),
       })
     ),
     JwtMiddlware(),

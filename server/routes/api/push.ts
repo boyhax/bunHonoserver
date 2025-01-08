@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { createClient } from "@supabase/supabase-js";
 import admin, { type ServiceAccount } from "firebase-admin";
-import serviceAccount from "@server/utils/service-account.json";
+import serviceAccount from "@/utils/service-account.json";
 
 interface Notification {
   id: string;

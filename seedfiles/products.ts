@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { faker } from "@faker-js/faker";
-import { Product } from "@server/models/product";
+import { Product } from "/models/product";
 
 // Connect to MongoDB
 

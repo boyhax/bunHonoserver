@@ -1,12 +1,7 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import {
-  createProduct,
-  findProduct,
-  listProducts,
-  updateProduct,
-} from "@server/services/products";
+import { findProduct, listProducts } from "@/services/products";
 
 // const productSchema = new mongoose.Schema({
 //   name: String,
@@ -44,31 +39,6 @@ const products = new Hono()
     const id = c.req.param("id");
     const data = await findProduct(id);
     return c.json({ data, error: null });
-  })
-  .put("/:id", zValidator("json", z.object({})), async (c) => {
-    // GET /book/:id
-    const id = c.req.param("id");
-    const data = c.req.valid("json");
-    const res = await updateProduct(id, data);
-    return c.json({ data: res, error: null });
-  })
-  .post(
-    "/",
-    zValidator(
-      "json",
-      z.object({
-        title: z.string(),
-        poster: z.string(),
-        price: z.number(),
-        discount: z.number().optional(),
-        user: z.string(),
-      })
-    ),
-    async (c) => {
-      const body = await c.req.valid("json");
-      const result = await createProduct(body);
-      return c.json(result);
-    }
-  );
+  });
 
 export default products;

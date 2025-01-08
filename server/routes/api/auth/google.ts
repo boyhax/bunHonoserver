@@ -1,7 +1,11 @@
 import { Hono } from "hono";
 import { google } from "googleapis";
-import { validRedirect } from "@server/config/oauthRedirectUrls";
-import { signjwt } from "@server/config/jwt";
+import { validRedirect } from "@/config/oauthRedirectUrls";
+import { signjwt } from "@/config/jwt";
+import { createUser } from "@/services/users";
+import { User } from "@/models/user";
+import { HTTPException } from "hono/http-exception";
+import bcrypt from "bcryptjs";
 
 function oauth2Client(redirect: string) {
   return new google.auth.OAuth2(
@@ -11,16 +15,11 @@ function oauth2Client(redirect: string) {
   );
 }
 
-// Simulated user database (replace with your actual database in production)
-const users = [];
-
-// JWT middleware configuration
-
-// Email/Password Sign Up
 const googleRoute = new Hono()
   .get("/", async (c) => {
     const { redirect } = c.req.query();
     const redirect_uri = redirect ?? c.req.url + "/callback";
+    console.log("redirect_uri :>> ", redirect_uri);
     const client = oauth2Client(redirect_uri);
     const url = client.generateAuthUrl({
       access_type: "offline",
@@ -49,19 +48,33 @@ const googleRoute = new Hono()
 
     const oauth2 = google.oauth2({ version: "v2", auth: client });
     const { data } = await oauth2.userinfo.get();
-    console.log("userinfo :>> ", data);
-    let user = users.find((user) => user.email === data.email);
+    if (!data.email) {
+      throw new HTTPException(400, { message: " email is required" });
+    }
+    const user = await User.findOne({ email: data.email }).exec();
     if (!user) {
-      user = { id: users.length + 1, email: data.email, name: data.name };
-      users.push(user);
+      const user = await createUser({
+        email: data.email,
+        name: data.given_name ?? "user name",
+        avatar: data.picture ?? "",
+        password: bcrypt.genSaltSync(10),
+      });
+
+      const token = await signjwt({
+        email: user.email,
+        id: user._id,
+        roles: ["user"],
+      });
+
+      return c.json({ token, user });
     }
 
     const token = await signjwt({
       email: user.email,
-      id: user.id,
+      id: user._id,
       roles: ["user"],
     });
-    return c.json({ token: token, user: data });
+    return c.json({ token, user });
   });
 
 export default googleRoute;

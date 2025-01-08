@@ -1,11 +1,12 @@
+import type { Context } from "hono";
 import { Suspense, renderToReadableStream } from "hono/jsx/streaming";
-import App from "../../../www";
-export default function clientRoute(c) {
+
+export default function clientRoute(c: Context) {
     const stream = renderToReadableStream(
         <html>
             <body>
                 <Suspense fallback={<div>loading...</div>}>
-                    <App />
+                    <h1 >hello from server</h1>
                 </Suspense>
             </body>
         </html>

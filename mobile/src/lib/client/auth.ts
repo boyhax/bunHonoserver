@@ -1,3 +1,4 @@
+import { Session, User } from "@/types";
 import { Client } from ".";
 
 type SignInOptions = {
@@ -5,38 +6,36 @@ type SignInOptions = {
   password: string;
   metadata: { name: string; full_name?: string };
 };
-type UserInfo = {
-  id: string;
-  email: string;
-  name: string;
-  full_name: string;
-};
+
 type oauthOptions = { provider: "google"; redirect: string };
 type oauthOptionstoken = { code: string; provider: "google"; redirect: string };
-type AuthResponse = { token: string; user: UserInfo };
+type AuthConfig = {
+  session: Session | null;
+  onAuthChange?: (session: Session | null) => void;
+};
+
 export type AuthClient = {
-  client: Client;
-  config: null | { provider?: "google" | "email"; token?: string };
+  config: AuthConfig;
   oauth: (options: oauthOptions) => Promise<{ url: string }>;
-  oauthToken: (options: oauthOptionstoken) => Promise<AuthResponse>;
-  signin: (options: SignInOptions) => Promise<AuthResponse>;
+  oauthToken: (options: oauthOptionstoken) => Promise<Session>;
+  signin: (options: SignInOptions) => Promise<Session>;
   signout: () => Promise<{ error: string }>;
-  signup: (options: {
-    email: string;
-    password: string;
-  }) => Promise<AuthResponse>;
+  signup: (options: { email: string; password: string }) => Promise<Session>;
 };
 
 export function authClient(
   client: Client,
-  config: { token?: string }
+  config: {
+    session: Session | null;
+    onAuthChange?: (session: Session | null) => void;
+  }
 ): AuthClient {
   async function oauth(options: oauthOptions): Promise<{ url: string }> {
     return await client
       .get("/auth/google?redirect=" + options.redirect)
       .then(async (c) => c.json() as { url: string });
   }
-  async function oauthToken(options: oauthOptionstoken): Promise<AuthResponse> {
+  async function oauthToken(options: oauthOptionstoken): Promise<Session> {
     return await client
       .get(
         "/auth/google/callback?redirect=" +
@@ -44,32 +43,59 @@ export function authClient(
           "&code=" +
           options.code
       )
-      .then(async (c) => c.json() as AuthResponse);
+      .then(async (c) => {
+        const body = await c.json();
+        if (!body.token) {
+          throw Error("user_sign_in_failed:Reason=>" + body?.error);
+        }
+        config.session = body;
+        config.onAuthChange && config.onAuthChange(null);
+        return config.session as Session;
+      });
   }
-  async function signin(options: SignInOptions): Promise<AuthResponse> {
+  async function signin(options: SignInOptions): Promise<Session> {
     return await client
-      .post("/auth/signin", options)
-      .then(async (c) => c.json() as AuthResponse);
+      .post("/auth/signin", { json: options })
+      .then(async (c) => {
+        const body = await c.json();
+        if (!body.token) {
+          throw Error("user_sign_in_failed:Reason=>" + body?.error);
+        }
+        config.session = body;
+        config.onAuthChange && config.onAuthChange(null);
+        return config.session as Session;
+      });
   }
 
   async function signout(): Promise<{ error: string }> {
     // Handle sign-out logic
-    return await client.post("/auth/signout", {}).then(async (c) => c.json());
+    return await client.post("/auth/signout", {}).then(async (c) => {
+      config.session = null;
+      config.onAuthChange && config.onAuthChange(null);
+      return c.json();
+    });
   }
 
   async function signup(options: {
     email: string;
     password: string;
-  }): Promise<AuthResponse> {
+  }): Promise<Session> {
     const { email, password } = options;
     // Handle sign-up logic
     return await client
-      .post("/auth/signup", { email, password })
-      .then(async (c) => c.json());
+      .post("/auth/signup", { json: { email, password } })
+      .then(async (c) => {
+        const body = await c.json();
+        if (!body.token) {
+          throw Error("user_sign_in_failed:Reason=>" + body?.error);
+        }
+        config.session = body;
+        config.onAuthChange && config.onAuthChange(null);
+        return config.session as Session;
+      });
   }
 
   return {
-    client,
     config,
     oauth,
     oauthToken,

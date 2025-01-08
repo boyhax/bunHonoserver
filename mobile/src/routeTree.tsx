@@ -4,8 +4,7 @@ import { shopsRoute, shopRoute } from './routes/shops';
 import { productsRoute, productRoute } from './routes/products';
 import { aboutRoute } from './routes/about';
 import { authGoogleCallbackRoute, authRoute } from './routes/auth';
-import AccountPage from './components/account/account-page';
-import { accountRoute } from './routes/account';
+import { accountProductsRoute, accountRoute } from './routes/account';
 
 export const routeTree = rootRoute.addChildren([
   homeRoute,
@@ -14,7 +13,7 @@ export const routeTree = rootRoute.addChildren([
   productsRoute,
   productRoute,
   aboutRoute,
-  accountRoute,
+  accountRoute.addChildren([accountProductsRoute]),
   authRoute.addChildren([authGoogleCallbackRoute]),
 
 ])

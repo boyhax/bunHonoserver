@@ -1,19 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Product } from "@server/models/product";
-import getPromise from "@server/utils/getpromise";
+import { Product } from "@/models/product";
 
 export async function listProducts(find: any) {
-  return getPromise(Product.find(find).limit(20).populate("user").exec());
+  return Product.find(find).limit(20).populate("user").exec();
 }
 export async function updateProduct(id: string, data: any) {
-  return getPromise(Product.findOneAndUpdate({ _id: id }, data).exec());
+  return Product.findOneAndUpdate({ _id: id }, data).exec();
 }
 export async function findProduct(id: string) {
-  return getPromise(Product.findOne({ _id: id }).populate("user").exec());
+  return Product.findOne({ _id: id }).populate("user").exec();
 }
 export async function deleteProduct(id: string) {
-  return getPromise(Product.findOneAndDelete({ _id: id }).exec());
+  return Product.findOneAndDelete({ _id: id }).exec();
 }
-export async function createProduct(data: any) {
-  return getPromise(Product.create(data));
-}
+export const createProduct = Product.create;

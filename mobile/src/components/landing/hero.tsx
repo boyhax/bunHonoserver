@@ -1,25 +1,32 @@
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center space-y-4 text-center">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-              Welcome to MultiShop
-            </h1>
-            <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
-              Discover unique products from multiple shops in one place. Shop from local artisans, global brands, and everything in between.
-            </p>
-          </div>
-          <div className="space-x-4">
-            <Button>Shop Now</Button>
-            <Button variant="outline">Learn More</Button>
+    <section className="relative bg-gradient-to-b from-primary/10 to-background pt-8 sm:pt-16 pb-8 sm:pb-12">
+      <div className="container px-4 sm:px-6">
+        <div className="text-center max-w-2xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-4 sm:mb-6">
+            Discover Amazing Products from{" "}
+            <span className="text-primary">Local Shops</span>
+          </h1>
+          <p className="text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8 px-4">
+            Shop from thousands of unique stores and find the perfect items you've been looking for.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search products..."
+                className="pl-9"
+              />
+            </div>
+            <Button className="w-full sm:w-auto">Search</Button>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }
-

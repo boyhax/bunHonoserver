@@ -42,7 +42,7 @@ export default function AuthPage() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
 
-    const redirect_uri = window.location.href + "/google-callback"
+    const redirect_uri = window.location.origin + "/auth/google-callback"
     await client.auth.oauth({ provider: 'google', redirect: redirect_uri })
       .then((c: any) => window.open(c.url, '_self'))
 
