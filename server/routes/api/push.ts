@@ -14,6 +14,7 @@ interface Notification {
 
 
 // see {@link https://stackoverflow.com/a/70281142}
+
 const { privateKey } = JSON.parse(process.env.PRIVATE_KEY as string)
 
 const serviceAccount: ServiceAccount = {
