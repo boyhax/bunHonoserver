@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { createClient } from "@supabase/supabase-js";
 import admin, { type ServiceAccount } from "firebase-admin";
-import serviceAccount from "@/utils/service-account.json";
+import { User } from "@/models/user";
+import { HTTPException } from "hono/http-exception";
 
 interface Notification {
   id: string;
@@ -11,17 +11,16 @@ interface Notification {
   url: string;
 }
 
-interface WebhookPayload {
-  type: "INSERT";
-  table: string;
-  record: Notification;
-  schema: "public";
-}
-const SUPABASE_URL = "https://api.manazl.site";
-const SUPABASE_SERVICE_ROLE_KEY =
-  "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTcyMDcyNzQwMCwiZXhwIjo0ODc2NDAxMDAwLCJyb2xlIjoic2VydmljZV9yb2xlIn0.F9bDVuOspKc2QfaJeXlBHRbuxWIlTwDwcAjqegaVbQM";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+// see {@link https://stackoverflow.com/a/70281142}
+const { privateKey } = JSON.parse(process.env.PRIVATE_KEY as string)
+
+const serviceAccount: ServiceAccount = {
+  privateKey,
+  projectId: process.env.PROJECT_ID,
+  clientEmail: process.env.CLIENT_EMAIL,
+}
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount as ServiceAccount),
   databaseURL:
@@ -31,22 +30,18 @@ admin.initializeApp({
 const push = new Hono();
 
 push.post("/", async (c) => {
-  const payload: WebhookPayload = await c.req.json();
-
-  const { data, error } = await supabase.auth.admin.getUserById(
-    payload.record.user_id
-  );
-  if (error) throw Error("user data not found");
-  const token = data!.user?.user_metadata?.fcm_token as string;
-  if (!token) throw Error("user fcm token not found");
-  const title = payload.record.title || "Manazl App";
-  const body = payload.record.body || "You Have New Notification";
+  const {title,body,user_id}:Notification = await c.req.json();
+  const user = await User.findById(user_id,"fcm").exec()
+  if (!user || !user.fcm) {
+    
+    throw new HTTPException(201,{message:"user fcm token not found"})
+  }
   const message = {
     notification: {
       title,
       body,
     },
-    token: token,
+    token: user.fcm,
   };
 
   const res = await admin

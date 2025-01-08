@@ -29,6 +29,10 @@ const UserSchema = new mongoose.Schema({
     type: productSchema,
     ref: "products",
   },
+  fcm: {
+    type: String,
+    required:false
+  },
 }).set("toJSON", {
   transform: (doc, ret) => {
     delete ret.email; // Remove email field
